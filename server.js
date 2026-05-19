@@ -38,14 +38,27 @@ dotenv.config();
 
 const app = express();
 
-/* -------------------- MIDDLEWARE -------------------- */
+/* -------------------- CORS CONFIG -------------------- */
+
+const allowedOrigins = ["http://localhost:3000", process.env.CLIENT_URL];
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: (origin, callback) => {
+      // allow Postman / mobile apps
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
+
+/* -------------------- MIDDLEWARE -------------------- */
 
 app.use(express.json());
 
